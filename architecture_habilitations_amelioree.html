@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture technique – Revue des habilitations</title>
+
+  <!-- Icônes colorées -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <!-- Diagrammes dynamiques -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <style>
+    :root {
+      --ink: #101828;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --surface: #ffffff;
+      --soft: #f8fafc;
+      --navy: #0b2a5b;
+      --blue: #2563eb;
+      --sky: #0284c7;
+      --green: #16a34a;
+      --emerald: #059669;
+      --purple: #7c3aed;
+      --violet: #6d28d9;
+      --orange: #ea580c;
+      --amber: #d97706;
+      --rose: #e11d48;
+      --shadow: 0 20px 45px rgba(15, 23, 42, .10);
+      --shadow-soft: 0 10px 28px rgba(15, 23, 42, .08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(37, 99, 235, .18), transparent 28%),
+        radial-gradient(circle at 95% 8%, rgba(124, 58, 237, .15), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+    }
+
+    .page {
+      max-width: 1720px;
+      margin: 0 auto;
+      padding: 34px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 30px;
+      padding: 34px 38px;
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(11, 42, 91, .97), rgba(37, 99, 235, .92)),
+        radial-gradient(circle at top right, rgba(255,255,255,.24), transparent 36%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -110px;
+      top: -130px;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      border: 70px solid rgba(255,255,255,.09);
+    }
+
+    .hero-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 13px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 18px 0 10px;
+      max-width: 1100px;
+      font-size: clamp(32px, 4vw, 56px);
+      line-height: 1.02;
+      letter-spacing: -1.7px;
+    }
+
+    .subtitle {
+      max-width: 920px;
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.55;
+      color: rgba(255,255,255,.86);
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      min-width: 410px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.22);
+      backdrop-filter: blur(10px);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 27px;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      font-size: 13px;
+      color: rgba(255,255,255,.78);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 34px 0 16px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -.5px;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(170px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 138px;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(208, 213, 221, .75);
+    }
+
+    .stage:not(:last-child)::after {
+      content: "\f061";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      right: -19px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--navy);
+      box-shadow: 0 8px 18px rgba(11, 42, 91, .25);
+      z-index: 2;
+      font-size: 13px;
+    }
+
+    .icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      display: inline-grid;
+      place-items: center;
+      color: #fff;
+      font-size: 21px;
+      margin-bottom: 14px;
+      box-shadow: 0 12px 20px rgba(15, 23, 42, .14);
+    }
+
+    .b-blue { background: linear-gradient(135deg, #2563eb, #0284c7); }
+    .b-green { background: linear-gradient(135deg, #16a34a, #059669); }
+    .b-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .b-orange { background: linear-gradient(135deg, #ea580c, #f59e0b); }
+    .b-rose { background: linear-gradient(135deg, #e11d48, #f97316); }
+    .b-navy { background: linear-gradient(135deg, #0b2a5b, #1d4ed8); }
+
+    .stage h3, .card h3, .lane h3, .data-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      letter-spacing: -.2px;
+    }
+
+    .stage p, .card p, .data-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 1.05fr 1.3fr .95fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .lane {
+      border-radius: 26px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(208, 213, 221, .8);
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+    }
+
+    .lane-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #eaecf0;
+    }
+
+    .lane-header .icon { margin: 0; width: 42px; height: 42px; font-size: 18px; }
+    .lane-header p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+
+    .stack { display: grid; gap: 12px; }
+
+    .card {
+      position: relative;
+      padding: 16px 16px 16px 62px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid #e4e7ec;
+    }
+
+    .card .mini-icon {
+      position: absolute;
+      left: 15px;
+      top: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .card ul {
+      margin: 8px 0 0;
+      padding-left: 17px;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .highlight {
+      border-color: rgba(22, 163, 74, .25);
+      background: linear-gradient(180deg, #fff, #f0fdf4);
+    }
+
+    .warning {
+      border-color: rgba(234, 88, 12, .22);
+      background: linear-gradient(180deg, #fff, #fff7ed);
+    }
+
+    .diagram-card {
+      border-radius: 26px;
+      background: #fff;
+      border: 1px solid rgba(208, 213, 221, .78);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .diagram-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 22px;
+      background: linear-gradient(90deg, #eff6ff, #f5f3ff);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .diagram-title h2 { margin: 0; font-size: 20px; }
+    .diagram-title span { color: var(--muted); font-size: 13px; }
+
+    .mermaid {
+      padding: 22px;
+      display: flex;
+      justify-content: center;
+      min-height: 420px;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .data-card {
+      border-radius: 22px;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid rgba(208, 213, 221, .8);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #344054;
+      background: #f2f4f7;
+      border: 1px solid #eaecf0;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1fr;
+      gap: 18px;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 11px;
+    }
+
+    .checklist li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .checklist i { color: var(--green); margin-top: 3px; }
+
+    .footer-note {
+      margin-top: 24px;
+      padding: 16px 20px;
+      border-radius: 20px;
+      color: #475467;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(208,213,221,.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    code {
+      padding: 3px 7px;
+      border-radius: 8px;
+      background: #f2f4f7;
+      color: #344054;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: .92em;
+    }
+
+    @media (max-width: 1300px) {
+      .hero-top, .architecture, .bottom-grid { grid-template-columns: 1fr; display: grid; }
+      .hero-metrics { min-width: 0; }
+      .flow, .data-grid { grid-template-columns: repeat(2, 1fr); }
+      .stage:not(:last-child)::after { display: none; }
+    }
+
+    @media (max-width: 760px) {
+      .page { padding: 18px; }
+      .hero { padding: 26px 22px; }
+      .hero-metrics, .flow, .data-grid { grid-template-columns: 1fr; }
+      .section-title { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page { max-width: none; padding: 12px; }
+      .hero, .stage, .lane, .diagram-card, .data-card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Piste 349 · Revue des habilitations</div>
+          <h1>Architecture technique de bout en bout</h1>
+          <p class="subtitle">Chaîne automatisée depuis l’export MyHabs jusqu’à la restitution métier, avec génération de groupes, création de formulaires Microsoft Forms, collecte Power Query et consolidation finale.</p>
+        </div>
+        <div class="hero-metrics" aria-label="Indicateurs clés">
+          <div class="metric"><strong>6</strong><span>étapes structurantes</span></div>
+          <div class="metric"><strong>1</strong><span>formulaire par groupe</span></div>
+          <div class="metric"><strong>400</strong><span>limite Forms par compte</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="flow" aria-label="Flux principal">
+      <article class="stage">
+        <div class="icon b-blue"><i class="fa-solid fa-database"></i></div>
+        <h3>1. Sources</h3>
+        <p>Export MyHabs, paramètres de campagne et contrôles d’entrée.</p>
+      </article>
+      <article class="stage">
+        <div class="icon b-green"><i class="fa-solid fa-filter-circle-dollar"></i></div>
+        <h3>2. Transformation</h3>
+        <p>Mapping fonctionnel, environnement et filtrage Production.</p>
+      </article>
+      <article class="stage">
+        <div class="icon b-purple"><i class="fa-solid fa-users-gear"></i></div>
+        <h3>3. Groupes</h3>
+        <p>Signatures de droits et attribution des groupes homogènes.</p>
+      </article>
+      <article class="stage">
+        <div class="icon b-orange"><i class="fa-brands fa-python"></i></div>
+        <h3>4. Python</h3>
+        <p>Création des formulaires et mise à jour du référentiel.</p>
+      </article>
+      <article class="stage">
+        <div class="icon b-rose"><i class="fa-solid fa-envelope-open-text"></i></div>
+        <h3>5. Collecte</h3>
+        <p>Emails, réponses Forms et récupération via Power Query.</p>
+      </article>
+      <article class="stage">
+        <div class="icon b-navy"><i class="fa-solid fa-chart-line"></i></div>
+        <h3>6. Restitution</h3>
+        <p>Consolidation, contrôles et livrable final de suivi.</p>
+      </article>
+    </section>
+
+    <div class="section-title">
+      <div>
+        <h2>Vue opérationnelle</h2>
+        <p>Les responsabilités sont regroupées par domaine : données, traitements et diffusion.</p>
+      </div>
+    </div>
+
+    <section class="architecture">
+      <aside class="lane">
+        <div class="lane-header">
+          <div class="icon b-blue"><i class="fa-solid fa-file-csv"></i></div>
+          <div>
+            <h3>Entrées & normalisation</h3>
+            <p>Préparer une base exploitable et fiable.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <article class="card">
+            <span class="mini-icon b-blue"><i class="fa-solid fa-database"></i></span>
+            <h3>Export MyHabs</h3>
+            <p><code>Directory_UserReport_AAAAMMJJHHMMSS.csv</code></p>
+            <ul>
+              <li>Date de début de campagne</li>
+              <li>Chemin source</li>
+              <li>Colonnes attendues</li>
+            </ul>
+          </article>
+          <article class="card highlight">
+            <span class="mini-icon b-green"><i class="fa-solid fa-circle-check"></i></span>
+            <h3>Validation source</h3>
+            <p>Contrôle bloquant si une colonne obligatoire est absente.</p>
+          </article>
+          <article class="card">
+            <span class="mini-icon b-purple"><i class="fa-solid fa-table-cells"></i></span>
+            <h3>Mapping métier</h3>
+            <p>Transformation MyHabs vers un fichier structuré et exploitable.</p>
+          </article>
+          <article class="card warning">
+            <span class="mini-icon b-orange"><i class="fa-solid fa-code-branch"></i></span>
+            <h3>Filtrage Production</h3>
+            <p>Déduction environnement : <code>0PRD</code>, <code>1HOM</code>, <code>2REC</code>, <code>3DEV</code>. Par défaut : Production.</p>
+          </article>
+        </div>
+      </aside>
+
+      <section class="diagram-card">
+        <div class="diagram-title">
+          <h2><i class="fa-solid fa-diagram-project"></i> Flux applicatif synthétique</h2>
+          <span>Mermaid.js · modifiable en texte</span>
+        </div>
+        <div class="mermaid">
+flowchart LR
+  A["Export MyHabs\nCSV"]:::source --> B["Validation\ncolonnes obligatoires"]:::control
+  B --> C["Mapping\nfonctionnel"]:::process
+  C --> D["Fichier exploitable\nXLSX"]:::file
+  D --> E["Macro Excel\nconstitution groupes"]:::vba
+  E --> F["Utilisateurs / groupes\nXLSX"]:::file
+  E --> G["Référentiel groupes\nXLSX"]:::file
+  G --> H["Script Python\ncréation Forms"]:::python
+  H --> I["Microsoft Forms\n1 formulaire / groupe"]:::m365
+  I --> J["Emailing\nliens de réponse"]:::mail
+  J --> K["Réponses Forms"]:::m365
+  K --> L["Power Query\ncollecte & normalisation"]:::pq
+  L --> M["Suivi habilitation\nXLSX final"]:::final
+
+  classDef source fill:#dbeafe,stroke:#2563eb,color:#0b2a5b,stroke-width:2px;
+  classDef control fill:#ecfdf5,stroke:#16a34a,color:#064e3b,stroke-width:2px;
+  classDef process fill:#f5f3ff,stroke:#7c3aed,color:#3b0764,stroke-width:2px;
+  classDef file fill:#f8fafc,stroke:#64748b,color:#0f172a,stroke-width:2px;
+  classDef vba fill:#ede9fe,stroke:#6d28d9,color:#2e1065,stroke-width:2px;
+  classDef python fill:#fff7ed,stroke:#ea580c,color:#7c2d12,stroke-width:2px;
+  classDef m365 fill:#dcfce7,stroke:#059669,color:#064e3b,stroke-width:2px;
+  classDef mail fill:#ffe4e6,stroke:#e11d48,color:#881337,stroke-width:2px;
+  classDef pq fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px;
+  classDef final fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e,stroke-width:2px;
+        </div>
+      </section>
+
+      <aside class="lane">
+        <div class="lane-header">
+          <div class="icon b-purple"><i class="fa-solid fa-gears"></i></div>
+          <div>
+            <h3>Automatisation & restitution</h3>
+            <p>Industrialiser la campagne et fiabiliser les livrables.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <article class="card">
+            <span class="mini-icon b-purple"><i class="fa-solid fa-layer-group"></i></span>
+            <h3>Macro Excel – Groupes</h3>
+            <ul>
+              <li>Clé droit : <code>Ressource|||Profil</code></li>
+              <li>Signature : droits triés + <code>###</code></li>
+              <li>1 signature = 1 groupe</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="mini-icon b-orange"><i class="fa-brands fa-python"></i></span>
+            <h3>Script Python</h3>
+            <ul>
+              <li>Lecture du référentiel</li>
+              <li>Création Forms</li>
+              <li>Ajout ID, date et lien de consultation</li>
+            </ul>
+          </article>
+          <article class="card highlight">
+            <span class="mini-icon b-green"><i class="fa-brands fa-microsoft"></i></span>
+            <h3>Microsoft 365</h3>
+            <p>Forms, réponses centralisées, stockage et connecteur Power Query.</p>
+          </article>
+          <article class="card">
+            <span class="mini-icon b-navy"><i class="fa-solid fa-chart-pie"></i></span>
+            <h3>Restitution métier</h3>
+            <p><code>suivi_habilitation_AAAA_MM.xlsx</code></p>
+          </article>
+        </div>
+      </aside>
+    </section>
+
+    <div class="section-title">
+      <div>
+        <h2>Modèle de données & fichiers</h2>
+        <p>Vue simplifiée des objets produits ou consommés par la chaîne.</p>
+      </div>
+    </div>
+
+    <section class="data-grid">
+      <article class="data-card">
+        <div class="icon b-blue"><i class="fa-solid fa-table"></i></div>
+        <h3>Fichier exploitable</h3>
+        <p>Typologie ressource, code ressource, profil, environnement, nom, prénom, email, identifiants.</p>
+        <div class="pill-list">
+          <span class="pill"><i class="fa-solid fa-file-excel"></i> XLSX</span>
+          <span class="pill"><i class="fa-solid fa-filter"></i> Production</span>
+        </div>
+      </article>
+      <article class="data-card">
+        <div class="icon b-purple"><i class="fa-solid fa-user-group"></i></div>
+        <h3>utilisateurs_groupes</h3>
+        <p>Nom, prénom, email, société, état et identifiant de groupe affecté.</p>
+        <div class="pill-list">
+          <span class="pill"><i class="fa-solid fa-key"></i> Email</span>
+          <span class="pill"><i class="fa-solid fa-users"></i> Groupe</span>
+        </div>
+      </article>
+      <article class="data-card">
+        <div class="icon b-orange"><i class="fa-solid fa-list-check"></i></div>
+        <h3>referentiel_groupes</h3>
+        <p>ID groupe, droits/questions, statut de création, date, ID formulaire et lien de consultation.</p>
+        <div class="pill-list">
+          <span class="pill"><i class="fa-solid fa-clipboard-question"></i> Questions</span>
+          <span class="pill"><i class="fa-solid fa-link"></i> Forms</span>
+        </div>
+      </article>
+      <article class="data-card">
+        <div class="icon b-green"><i class="fa-solid fa-square-poll-vertical"></i></div>
+        <h3>suivi_habilitation</h3>
+        <p>Consolidation finale des réponses par utilisateur, groupe et droit.</p>
+        <div class="pill-list">
+          <span class="pill"><i class="fa-solid fa-chart-line"></i> Reporting</span>
+          <span class="pill"><i class="fa-solid fa-shield"></i> Contrôles</span>
+        </div>
+      </article>
+    </section>
+
+    <div class="section-title">
+      <div>
+        <h2>Règles, sécurité et exploitation</h2>
+        <p>Les points de contrôle critiques sont rendus visibles pour faciliter la revue.</p>
+      </div>
+    </div>
+
+    <section class="bottom-grid">
+      <article class="lane">
+        <div class="lane-header">
+          <div class="icon b-purple"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div>
+            <h3>Règles clés</h3>
+            <p>Construction et dédoublonnage.</p>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li><i class="fa-solid fa-check"></i> Seules les habilitations Production sont conservées.</li>
+          <li><i class="fa-solid fa-check"></i> Un doublon de droit est compté une seule fois.</li>
+          <li><i class="fa-solid fa-check"></i> Les données utilisateur sont prises à la première occurrence.</li>
+          <li><i class="fa-solid fa-check"></i> Une signature unique produit un groupe unique.</li>
+        </ul>
+      </article>
+
+      <article class="lane">
+        <div class="lane-header">
+          <div class="icon b-rose"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <h3>Contrôles & sécurité</h3>
+            <p>Fiabilité et traçabilité.</p>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li><i class="fa-solid fa-check"></i> Vérification des colonnes obligatoires avant traitement.</li>
+          <li><i class="fa-solid fa-check"></i> Logs systématiques dans <code>\LOG\log_jjmmaaaa.txt</code>.</li>
+          <li><i class="fa-solid fa-check"></i> Traçabilité transformation, création, envoi et collecte.</li>
+          <li><i class="fa-solid fa-check"></i> Compte service dédié pour Microsoft Forms.</li>
+        </ul>
+      </article>
+
+      <article class="lane">
+        <div class="lane-header">
+          <div class="icon b-navy"><i class="fa-solid fa-folder-tree"></i></div>
+          <div>
+            <h3>Stockage</h3>
+            <p>Répertoires et livrables.</p>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li><i class="fa-solid fa-check"></i> Racine d’exécution : <code>AAAA.MM</code>.</li>
+          <li><i class="fa-solid fa-check"></i> Livrables : suivi, groupes, référentiel, suivi emails.</li>
+          <li><i class="fa-solid fa-check"></i> Réponses Forms centralisées dans Microsoft 365.</li>
+          <li><i class="fa-solid fa-check"></i> Collecte incrémentielle via Power Query.</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="footer-note">
+      <span><strong>Légende :</strong> bleu = sources & données · vert = Microsoft 365 / validation · violet = règles de regroupement · orange = automatisation · rose = communication · marine = restitution.</span>
+      <span><code>|||</code> ressource/profil · <code>###</code> signature de droits</span>
+    </div>
+  </main>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      securityLevel: 'loose',
+      flowchart: {
+        curve: 'basis',
+        htmlLabels: true,
+        nodeSpacing: 42,
+        rankSpacing: 56
+      },
+      themeVariables: {
+        fontFamily: 'Inter, Arial, sans-serif',
+        primaryColor: '#eff6ff',
+        primaryTextColor: '#101828',
+        primaryBorderColor: '#2563eb',
+        lineColor: '#475467',
+        secondaryColor: '#f5f3ff',
+        tertiaryColor: '#ecfdf5'
+      }
+    });
+  </script>
+</body>
+</html>
