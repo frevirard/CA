@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture fonctionnelle – Génération des groupes d’habilitations</title>
+
+  <!-- Icônes flat vectorielles professionnelles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <style>
+    :root {
+      --blue-dark: #0b1f4d;
+      --blue: #1464b4;
+      --blue-2: #2f7cc8;
+      --blue-soft: #eef6ff;
+      --green: #168747;
+      --green-soft: #effaf3;
+      --orange: #ea7a21;
+      --orange-soft: #fff6ed;
+      --purple: #7056c8;
+      --purple-soft: #f4f1ff;
+      --red: #d92d20;
+      --red-soft: #fff1f0;
+      --grey: #f7f9fc;
+      --line: #b8c9df;
+      --text: #111827;
+      --muted: #536174;
+      --shadow: 0 8px 22px rgba(15, 43, 92, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .page {
+      width: 1640px;
+      min-height: 1110px;
+      margin: 0 auto;
+      padding: 18px 22px 26px;
+      background:
+        radial-gradient(circle at top left, rgba(49, 124, 200, .10), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(22, 135, 71, .08), transparent 26%),
+        linear-gradient(180deg, #fff 0%, #f7fbff 100%);
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .title h1 {
+      margin: 0;
+      color: #0b1230;
+      font-size: 31px;
+      line-height: 1.15;
+      text-transform: uppercase;
+      letter-spacing: .2px;
+      font-weight: 900;
+    }
+
+    .title p {
+      margin: 8px 0 0;
+      color: #101828;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .top-zone {
+      display: grid;
+      grid-template-columns: 1fr 212px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .top-flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .step-card {
+      position: relative;
+      min-height: 282px;
+      padding: 14px 15px 13px;
+      border: 2px solid var(--blue-2);
+      border-radius: 8px;
+      background: rgba(255,255,255,.94);
+      box-shadow: var(--shadow);
+    }
+
+    .step-card::after {
+      content: "";
+      position: absolute;
+      right: -34px;
+      top: 110px;
+      width: 34px;
+      height: 26px;
+      background: var(--blue-dark);
+      clip-path: polygon(0 30%, 62% 30%, 62% 0, 100% 50%, 62% 100%, 62% 70%, 0 70%);
+      z-index: 4;
+    }
+
+    .step-card.last::after { display: none; }
+
+    .num {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0f5fa8, #2c7fc9);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 4px 10px rgba(15,95,168,.25);
+    }
+
+    .step-card h2 {
+      margin: 3px 0 8px 42px;
+      color: #0c3e82;
+      font-size: 14px;
+      line-height: 1.15;
+      text-align: center;
+      text-transform: uppercase;
+      min-height: 34px;
+    }
+
+    .step-card .subtitle {
+      margin: -4px 0 10px 42px;
+      text-align: center;
+      font-size: 12px;
+      color: #24466f;
+      font-weight: 700;
+    }
+
+    .center { text-align: center; }
+    .small { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .strong { font-weight: 800; color: #111827; }
+
+    ul {
+      margin: 8px 0 0 16px;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1.42;
+      color: #111827;
+    }
+
+    li { margin-bottom: 5px; }
+
+    code {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: #eef2f7;
+      color: #26364d;
+      font-family: Consolas, Monaco, monospace;
+      font-size: .92em;
+      font-weight: 800;
+    }
+
+    .big-row-icon {
+      height: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 8px 0 12px;
+    }
+
+    .db-icon {
+      width: 62px;
+      height: 62px;
+    }
+
+    .file-icon {
+      width: 56px;
+      height: 70px;
+      border: 3px solid #244a7b;
+      border-radius: 3px;
+      position: relative;
+      background: #f8fbff;
+      display: grid;
+      place-items: center;
+      color: #111827;
+      font-weight: 900;
+      font-size: 17px;
+    }
+
+    .file-icon::before {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: -3px;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, transparent 50%, #dcecff 50%);
+      border-left: 3px solid #244a7b;
+      border-bottom: 3px solid #244a7b;
+    }
+
+    .excel-logo {
+      width: 70px;
+      height: 70px;
+      border-radius: 8px;
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      color: #fff;
+      font-size: 42px;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(0,0,0,.12);
+      overflow: hidden;
+      background: linear-gradient(135deg, #107c41 0%, #185c37 100%);
+    }
+
+    .excel-logo::after {
+      content: "";
+      position: absolute;
+      right: -16px;
+      top: 8px;
+      width: 42px;
+      height: 54px;
+      background: rgba(255,255,255,.18);
+      border-radius: 6px;
+    }
+
+    .gear-icons i {
+      color: #6485ab;
+      filter: drop-shadow(0 5px 8px rgba(31, 65, 110, .16));
+    }
+    .gear-icons i:nth-child(1) { font-size: 52px; }
+    .gear-icons i:nth-child(2) { font-size: 40px; margin-left: -4px; transform: translateY(-18px); }
+    .gear-icons i:nth-child(3) { font-size: 32px; margin-left: -16px; transform: translateY(22px); }
+
+    .filter-icon, .signature-icon, .matrix-icon, .summary-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 34px;
+      box-shadow: 0 8px 16px rgba(0,0,0,.13);
+    }
+    .filter-icon { background: linear-gradient(135deg, #2f7cc8, #0b5cab); }
+    .signature-icon { background: linear-gradient(135deg, #7056c8, #4f46e5); }
+    .matrix-icon { background: linear-gradient(135deg, #168747, #0f6b38); }
+    .summary-icon { background: linear-gradient(135deg, #ea7a21, #c2410c); }
+
+    .side-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .side-panel {
+      border: 1.6px solid #c8c5e9;
+      border-radius: 9px;
+      background: linear-gradient(180deg, #f6f3ff, #fff);
+      padding: 14px;
+      box-shadow: 0 5px 14px rgba(67, 56, 202, .10);
+    }
+
+    .side-panel h3 {
+      margin: 0 0 12px;
+      color: #172554;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .side-line {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 9px;
+      align-items: start;
+      margin-bottom: 12px;
+      font-size: 11px;
+      line-height: 1.25;
+      color: #1f2937;
+      font-weight: 700;
+    }
+
+    .round-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eef2ff;
+      color: #0f5fa8;
+      font-size: 14px;
+    }
+
+    .detail {
+      margin-top: 18px;
+      border: 1.8px solid #9bb7d7;
+      border-radius: 7px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .detail-title {
+      background: linear-gradient(180deg, #cfe1f3, #bcd5ef);
+      color: #111827;
+      text-transform: uppercase;
+      text-align: center;
+      font-weight: 900;
+      padding: 9px;
+      border-bottom: 1.8px solid #9bb7d7;
+      font-size: 14px;
+    }
+
+    .detail-body {
+      display: grid;
+      grid-template-columns: 282px 306px 360px 284px 278px;
+      gap: 14px;
+      padding: 14px 12px;
+      align-items: stretch;
+    }
+
+    .mini-panel {
+      position: relative;
+      border: 1.7px solid #7ea9d6;
+      border-radius: 8px;
+      background: #fbfdff;
+      padding: 10px;
+    }
+
+    .mini-panel.green { border-color: #84b88b; background: #fbfffb; }
+    .mini-panel.orange { border-color: #f3a65c; background: #fffdf9; }
+    .mini-panel.purple { border-color: #a89ce5; background: #fcfaff; }
+    .mini-panel.red { border-color: #f4a7a2; background: #fffafa; }
+
+    .mini-panel h3 {
+      margin: 0 0 11px;
+      text-align: center;
+      color: #0c3e82;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+    .mini-panel.green h3 { color: #14532d; }
+    .mini-panel.orange h3 { color: #c2410c; }
+    .mini-panel.purple h3 { color: #4c1d95; }
+    .mini-panel.red h3 { color: #b42318; }
+
+    .box-list { display: grid; gap: 10px; }
+
+    .process-box {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      align-items: center;
+      gap: 10px;
+      border: 1.5px solid #8fb2d8;
+      border-radius: 7px;
+      background: linear-gradient(180deg, #fff, #f4f8fd);
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .process-box i {
+      font-size: 25px;
+      color: #2f659e;
+      text-align: center;
+    }
+
+    .process-box.green { border-color: #8fc396; background: #f7fff8; }
+    .process-box.green i { color: #168747; }
+    .process-box.orange { border-color: #f3a65c; background: #fff8f0; }
+    .process-box.orange i { color: #ea7a21; }
+    .process-box.purple { border-color: #b5a9e8; background: #faf8ff; }
+    .process-box.purple i { color: #7056c8; }
+    .process-box.red { border-color: #f4a7a2; background: #fff7f7; }
+    .process-box.red i { color: #d92d20; }
+
+    .flow-arrow-right {
+      position: absolute;
+      right: -25px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 24px;
+      background: var(--blue-dark);
+      clip-path: polygon(0 31%, 62% 31%, 62% 0, 100% 50%, 62% 100%, 62% 69%, 0 69%);
+      z-index: 8;
+    }
+
+    .file-box {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 10px;
+      align-items: center;
+      border: 1.5px solid #8fc396;
+      border-radius: 7px;
+      background: #f7fff8;
+      padding: 9px 10px;
+      margin-bottom: 10px;
+      min-height: 72px;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .small-excel {
+      width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #107c41, #185c37);
+      color: #fff;
+      font-size: 25px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 12px rgba(16,124,65,.20);
+    }
+
+    .formula-box {
+      padding: 9px;
+      border-radius: 8px;
+      border: 1.5px dashed #9aa7bd;
+      background: #f8fafc;
+      text-align: center;
+      font-size: 11.5px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+
+    .down {
+      width: 2px;
+      height: 17px;
+      background: #0c3e82;
+      position: relative;
+      margin: -3px auto;
+    }
+    .down::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 8px solid #0c3e82;
+    }
+
+    .outputs-band {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .output-card {
+      border: 1.7px solid #7fb58a;
+      border-radius: 8px;
+      background: #f7fff8;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 100px;
+    }
+    .output-card h3 {
+      margin: 0 0 5px;
+      font-size: 14px;
+      color: #14532d;
+      text-transform: uppercase;
+    }
+    .output-card p { margin: 0; font-size: 12px; line-height: 1.35; color: #1f2937; font-weight: 700; }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.05fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .info-panel {
+      border: 1.5px solid #cfd8e5;
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px 14px;
+      box-shadow: 0 6px 15px rgba(15,43,92,.07);
+    }
+    .info-panel h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      text-align: center;
+      text-transform: uppercase;
+      color: #172554;
+    }
+    .info-panel ul { font-size: 11.5px; line-height: 1.45; }
+    .info-panel li { margin-bottom: 4px; }
+
+    .legend {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .legend-box {
+      border: 1.5px solid #cfd8e5;
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      white-space: nowrap;
+    }
+    .legend-item i { font-size: 22px; color: #2f659e; }
+    .legend-item .small-excel { width: 30px; height: 30px; font-size: 18px; }
+
+    .final-box {
+      border: 1.6px solid #77bc84;
+      border-radius: 9px;
+      background: #f3fff6;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+    .final-check {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #16a34a, #047857);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      box-shadow: 0 10px 20px rgba(22, 163, 74, .22);
+    }
+    .final-box h3 {
+      margin: 0 0 5px;
+      color: #166534;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    .final-box ul { margin-top: 5px; font-size: 11.5px; }
+
+    @media print {
+      body { background: #fff; }
+      .page { transform: scale(.70); transform-origin: top left; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="title">
+      <h1>Architecture fonctionnelle – Génération des groupes d’habilitations</h1>
+      <p>Traitement du fichier exploitable, validation des données, construction des signatures et production des fichiers de sortie</p>
+    </header>
+
+    <section class="top-zone">
+      <div class="top-flow">
+        <article class="step-card">
+          <div class="num">1</div>
+          <h2>Fichier source</h2>
+          <div class="subtitle">Droits utilisateur</div>
+          <div class="big-row-icon">
+            <svg class="db-icon" viewBox="0 0 80 80" aria-hidden="true">
+              <ellipse cx="40" cy="16" rx="31" ry="11" fill="#eef6ff" stroke="#244a7b" stroke-width="3"/>
+              <path d="M9 16v44c0 6 14 11 31 11s31-5 31-11V16" fill="none" stroke="#244a7b" stroke-width="3"/>
+              <path d="M9 31c0 6 14 11 31 11s31-5 31-11M9 47c0 6 14 11 31 11s31-5 31-11" fill="none" stroke="#244a7b" stroke-width="3"/>
+            </svg>
+            <div class="file-icon">XLSX</div>
+          </div>
+          <p class="strong center">fichier_exploitable.xlsx</p>
+          <ul>
+            <li>1 ligne = 1 droit attribué</li>
+            <li>Utilisateur répété selon ses droits</li>
+            <li>13 colonnes attendues de A à M</li>
+          </ul>
+        </article>
+
+        <article class="step-card">
+          <div class="num">2</div>
+          <h2>Contrôle & validation</h2>
+          <div class="subtitle">Pré-traitement bloquant</div>
+          <div class="big-row-icon">
+            <div class="filter-icon"><i class="fa-solid fa-filter-circle-xmark"></i></div>
+          </div>
+          <ul>
+            <li>Profil ressource obligatoire</li>
+            <li>Email obligatoire</li>
+            <li>Email valide : <code>@</code> + <code>.</code></li>
+            <li>Colonnes attendues contrôlées</li>
+          </ul>
+        </article>
+
+        <article class="step-card">
+          <div class="num">3</div>
+          <h2>Identification des clés</h2>
+          <div class="subtitle">Droits & utilisateurs</div>
+          <div class="big-row-icon gear-icons">
+            <i class="fa-solid fa-key"></i><i class="fa-solid fa-user"></i><i class="fa-solid fa-lock"></i>
+          </div>
+          <ul>
+            <li><code>cleUniqueDroit</code> = ressource + profil</li>
+            <li><code>clePersonne</code> = email en minuscules</li>
+            <li>1re occurrence = données personnelles</li>
+          </ul>
+        </article>
+
+        <article class="step-card">
+          <div class="num">4</div>
+          <h2>Signature utilisateur</h2>
+          <div class="subtitle">Regroupement stable</div>
+          <div class="big-row-icon">
+            <div class="signature-icon"><i class="fa-solid fa-fingerprint"></i></div>
+          </div>
+          <ul>
+            <li>Collecte des droits uniques</li>
+            <li>Tri alphabétique croissant</li>
+            <li>Concaténation avec <code>###</code></li>
+          </ul>
+        </article>
+
+        <article class="step-card">
+          <div class="num">5</div>
+          <h2>Attribution des groupes</h2>
+          <div class="subtitle">Signature → groupe</div>
+          <div class="big-row-icon">
+            <div class="matrix-icon"><i class="fa-solid fa-users-gear"></i></div>
+          </div>
+          <ul>
+            <li>Mêmes droits = même signature</li>
+            <li>1 signature unique = 1 groupe</li>
+            <li><code>GROUPE_001</code>, <code>GROUPE_002</code>…</li>
+          </ul>
+        </article>
+
+        <article class="step-card last">
+          <div class="num">6</div>
+          <h2>Production & restitution</h2>
+          <div class="subtitle">Fichiers de sortie</div>
+          <div class="big-row-icon">
+            <div class="summary-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="excel-logo">X</div>
+          </div>
+          <ul>
+            <li>Fichiers Excel exploitables</li>
+            <li>Résumé utilisateur</li>
+            <li>Lignes ignorées restituées</li>
+          </ul>
+        </article>
+      </div>
+
+      <aside class="side-stack">
+        <section class="side-panel">
+          <h3>Contrôles & sécurité</h3>
+          <div class="side-line"><span class="round-icon"><i class="fa-solid fa-table-columns"></i></span><span>Vérification des colonnes A à M avant traitement</span></div>
+          <div class="side-line"><span class="round-icon"><i class="fa-solid fa-ban"></i></span><span>Arrêt immédiat si colonne introuvable</span></div>
+          <div class="side-line"><span class="round-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span>Gestion des erreurs inattendues : code + message</span></div>
+          <div class="side-line"><span class="round-icon"><i class="fa-solid fa-file-shield"></i></span><span>Fichiers ouverts fermés proprement sans sauvegarde en erreur</span></div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="detail">
+      <div class="detail-title">Détail du traitement et des productions</div>
+      <div class="detail-body">
+        <article class="mini-panel">
+          <h3>1. Lecture du fichier source</h3>
+          <div class="box-list">
+            <div class="process-box"><i class="fa-solid fa-file-excel"></i><span>Lecture de <code>fichier_exploitable.xlsx</code></span></div>
+            <div class="process-box"><i class="fa-solid fa-list-ol"></i><span>Contrôle de l’ordre des colonnes A à M</span></div>
+            <div class="process-box"><i class="fa-solid fa-user-tag"></i><span>Chaque ligne représente un droit attribué à un utilisateur</span></div>
+            <div class="process-box"><i class="fa-solid fa-layer-group"></i><span>Un même utilisateur peut apparaître sur plusieurs lignes</span></div>
+          </div>
+          <div class="flow-arrow-right"></div>
+        </article>
+
+        <article class="mini-panel red">
+          <h3>2. Filtrage & validation</h3>
+          <div class="box-list">
+            <div class="process-box red"><i class="fa-solid fa-circle-xmark"></i><span>Ligne ignorée si <strong>Profil de la ressource</strong> vide</span></div>
+            <div class="process-box red"><i class="fa-solid fa-envelope-circle-check"></i><span>Email obligatoire avec regex : <code>@</code> et au moins un <code>.</code></span></div>
+            <div class="process-box orange"><i class="fa-solid fa-calculator"></i><span>Nombre d’emails invalides comptabilisé</span></div>
+            <div class="process-box green"><i class="fa-solid fa-file-export"></i><span>Restitution des lignes ignorées dans un fichier Excel exploitable</span></div>
+          </div>
+          <div class="flow-arrow-right"></div>
+        </article>
+
+        <article class="mini-panel purple">
+          <h3>3. Clés, signatures & groupes</h3>
+          <div class="formula-box">
+            <div><code>cleUniqueDroit</code></div>
+            <div>Code et Nom ressource + <code>|||</code> + Profil ressource</div>
+          </div>
+          <div class="formula-box">
+            <div><code>clePersonne</code></div>
+            <div><code>LCase(AdresseMail)</code></div>
+          </div>
+          <div class="formula-box">
+            <div><code>signature</code></div>
+            <div>Sort(listeClesUniques).Join(<code>###</code>)</div>
+          </div>
+          <div class="box-list">
+            <div class="process-box purple"><i class="fa-solid fa-user-check"></i><span>Données personnelles capturées à la première occurrence uniquement</span></div>
+            <div class="process-box purple"><i class="fa-solid fa-copy"></i><span>Droits en doublon pour un utilisateur comptés une seule fois</span></div>
+            <div class="process-box purple"><i class="fa-solid fa-users"></i><span>Mapping signature → identifiant groupe conservé</span></div>
+          </div>
+          <div class="flow-arrow-right"></div>
+        </article>
+
+        <article class="mini-panel green">
+          <h3>4. Génération des fichiers</h3>
+          <div class="file-box"><div class="small-excel">X</div><span><strong>utilisateurs_groupes.xlsx</strong><br>1 ligne par utilisateur unique<br>Nom, Prénom, Email, Société, État, Groupe</span></div>
+          <div class="file-box"><div class="small-excel">X</div><span><strong>referentiel_groupes.xlsx</strong><br>1 ligne par groupe<br>Colonnes droits + colonnes formulaire</span></div>
+          <div class="file-box"><div class="small-excel">X</div><span><strong>suivi_habilitation_AAAA_MM.xlsx</strong><br>Livrable final attendu</span></div>
+          <div class="process-box green"><i class="fa-solid fa-folder-plus"></i><span>Création du dossier <code>AAAA.MM</code> si inexistant</span></div>
+          <div class="flow-arrow-right"></div>
+        </article>
+
+        <article class="mini-panel orange">
+          <h3>5. Résumé & indicateurs</h3>
+          <div class="box-list">
+            <div class="process-box orange"><i class="fa-solid fa-users"></i><span>Nombre d’utilisateurs traités</span></div>
+            <div class="process-box orange"><i class="fa-solid fa-people-group"></i><span>Nombre de groupes créés</span></div>
+            <div class="process-box orange"><i class="fa-solid fa-key"></i><span>Nombre de droits distincts détectés</span></div>
+            <div class="process-box orange"><i class="fa-solid fa-envelope-circle-xmark"></i><span>Nombre de lignes ignorées pour email invalide</span></div>
+            <div class="process-box orange"><i class="fa-solid fa-folder-tree"></i><span>Chemin du répertoire de sortie</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="outputs-band">
+      <article class="output-card">
+        <div class="excel-logo">X</div>
+        <div>
+          <h3>utilisateurs_groupes_AAAA_MM.xlsx</h3>
+          <p>Fichier tabulaire : une ligne par utilisateur unique, dédupliqué sur l’adresse mail, avec groupe attribué.</p>
+        </div>
+      </article>
+      <article class="output-card">
+        <div class="excel-logo">X</div>
+        <div>
+          <h3>referentiel_groupe_AAAA_MM.xlsx</h3>
+          <p>Fichier matriciel : une ligne par groupe, une colonne par droit distinct, cellules “Inclus” si le groupe possède le droit.</p>
+        </div>
+      </article>
+      <article class="output-card">
+        <div class="excel-logo">X</div>
+        <div>
+          <h3>suivi_habilitation_AAAA_MM.xlsx</h3>
+          <p>Livrable final métier attendu, consolidant les habilitations et le suivi de la revue.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="bottom-grid">
+      <article class="info-panel">
+        <h3><i class="fa-solid fa-table"></i> Format source</h3>
+        <ul>
+          <li>A : Typologie de la ressource</li>
+          <li>B : Code et Nom de la ressource</li>
+          <li>C : Profil de la ressource</li>
+          <li>D : Environnement</li>
+          <li>E/F : Nom / Prénom</li>
+          <li>G à M : Société, service, référence, email, état, départ, identifiants</li>
+        </ul>
+      </article>
+
+      <article class="info-panel">
+        <h3><i class="fa-solid fa-clipboard-question"></i> Référentiel groupes</h3>
+        <ul>
+          <li>Colonne A : Id du groupe</li>
+          <li>Colonnes B à n : une colonne par droit distinct</li>
+          <li>Question : “Voulez-vous conserver le profil … ?”</li>
+          <li>Colonnes finales : Formulaire créé, Date, Id formulaire, Lien consultation</li>
+          <li>Cellule “Inclus” : fond vert clair, gras, centré</li>
+        </ul>
+      </article>
+
+      <article class="info-panel">
+        <h3><i class="fa-solid fa-scale-balanced"></i> Principes clés</h3>
+        <ul>
+          <li>Les séparateurs <code>|||</code> et <code>###</code> doivent être absents des données sources.</li>
+          <li>La signature est stable car elle est construite sur des droits triés.</li>
+          <li>Un même ensemble de droits produit toujours le même groupe.</li>
+          <li>La première occurrence de l’utilisateur fait foi pour les données personnelles.</li>
+        </ul>
+      </article>
+
+      <article class="info-panel">
+        <h3><i class="fa-solid fa-triangle-exclamation"></i> Gestion des erreurs</h3>
+        <ul>
+          <li>Colonne manquante : message explicite et arrêt du traitement.</li>
+          <li>Erreur inattendue : affichage du code et du message d’erreur.</li>
+          <li>Fermeture propre des fichiers ouverts.</li>
+          <li>Aucune sauvegarde des fichiers ouverts en cas d’erreur bloquante.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="legend">
+      <div class="legend-box">
+        <span class="legend-item"><i class="fa-solid fa-right-long"></i>Flux de données</span>
+        <span class="legend-item"><span class="small-excel">X</span>Fichier Excel</span>
+        <span class="legend-item"><i class="fa-solid fa-filter-circle-xmark"></i>Filtrage / validation</span>
+        <span class="legend-item"><i class="fa-solid fa-fingerprint"></i>Signature utilisateur</span>
+        <span class="legend-item"><i class="fa-solid fa-users-gear"></i>Groupe d’habilitations</span>
+        <span class="legend-item"><i class="fa-solid fa-triangle-exclamation"></i>Erreur / rejet</span>
+        <span class="legend-item"><i class="fa-solid fa-folder-tree"></i>Répertoire de sortie</span>
+      </div>
+
+      <div class="final-box">
+        <div class="final-check"><i class="fa-solid fa-check"></i></div>
+        <div>
+          <h3>Livrables finaux</h3>
+          <ul>
+            <li>suivi_habilitation_AAAA_MM.xlsx</li>
+            <li>referentiel_groupe_AAAA_MM.xlsx</li>
+            <li>utilisateurs_groupes_AAAA_MM.xlsx</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
