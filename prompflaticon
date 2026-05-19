@@ -1,0 +1,96 @@
+Tu es un expert en design d’architecture fonctionnelle et technique, spécialisé en HTML, CSS et JavaScript.
+
+Je veux que tu génères une page HTML complète, autonome et professionnelle, représentant une architecture applicative, fonctionnelle ou technique sous forme de schéma visuel.
+
+Le rendu attendu doit être proche d’un schéma PowerPoint professionnel d’architecture : clair, structuré, coloré, lisible, avec de belles icônes et une organisation visuelle soignée.
+
+STYLE VISUEL ATTENDU
+
+- Fond clair, propre, légèrement dégradé.
+- Titre principal centré en haut de page.
+- Sous-titre explicatif sous le titre.
+- Grandes étapes horizontales numérotées.
+- Flèches épaisses entre les étapes.
+- Cartes avec bordures bleues, angles arrondis et ombres légères.
+- Icônes grandes, colorées et homogènes.
+- Zone centrale ou basse détaillant les traitements internes.
+- Panneaux latéraux pour les contrôles, la sécurité, les répertoires, le stockage ou les principes clés.
+- Légende en bas de page.
+- Bloc “Livrables finaux” bien visible, avec une grande coche verte.
+- Rendu adapté à une présentation en réunion, comité projet ou support de documentation.
+
+STYLE DES ICÔNES
+
+Utilise un style d’icônes **flat design vectoriel professionnel**, coloré, lisible et homogène, proche des pictogrammes utilisés dans les schémas d’architecture SI, les cartographies applicatives et les présentations PowerPoint.
+
+Les icônes doivent avoir les caractéristiques suivantes :
+
+- style vectoriel plat ;
+- couleurs franches et cohérentes ;
+- contours nets ;
+- formes simples ;
+- bonne lisibilité même en petite taille ;
+- rendu professionnel, non cartoon ;
+- cohérence entre les icônes génériques et les logos produits ;
+- usage de pictogrammes semi-officiels pour les composants SI ;
+- usage de logos officiels ou proches de l’officiel pour les technologies et produits quand ils existent.
+
+Ne pas utiliser :
+- icônes 3D ;
+- icônes réalistes ;
+- illustrations cartoon ;
+- images décoratives inutiles ;
+- styles trop détaillés ;
+- pictogrammes incohérents entre eux.
+
+CONTRAINTES TECHNIQUES
+
+- Générer un seul fichier HTML complet.
+- Inclure le CSS dans une balise <style>.
+- Inclure le JavaScript éventuel dans une balise <script>.
+- Ne pas utiliser d’images locales.
+- Utiliser uniquement des ressources CDN fiables.
+- Le fichier doit fonctionner directement dans un navigateur moderne.
+- Le code doit être propre, lisible, structuré et facilement modifiable.
+- Prévoir un rendu imprimable via une règle @media print.
+- Prévoir un minimum de responsive design pour que la page reste lisible sur différents écrans.
+- Éviter les dépendances inutiles.
+- Ne pas générer un simple tableau : le résultat doit être un vrai schéma visuel d’architecture.
+
+LIBRAIRIES ET ICÔNES À UTILISER
+
+Utilise les bibliothèques suivantes si elles sont utiles :
+
+1. Font Awesome
+
+À utiliser pour les icônes génériques :
+- base de données ;
+- fichier ;
+- email ;
+- utilisateur ;
+- sécurité ;
+- validation ;
+- dossier ;
+- engrenage ;
+- flèche ;
+- graphique ;
+- cloud ;
+- API ;
+- serveur ;
+- logs ;
+- règles ;
+- workflow ;
+- supervision.
+
+Utiliser principalement :
+- `fa-solid` pour les pictogrammes pleins ;
+- `fa-regular` pour les pictogrammes plus légers ;
+- éviter de mélanger trop de styles différents.
+
+Exemples :
+```html
+<i class="fa-solid fa-database"></i>
+<i class="fa-solid fa-gears"></i>
+<i class="fa-regular fa-envelope"></i>
+<i class="fa-solid fa-lock"></i>
+<i class="fa-solid fa-users"></i>
