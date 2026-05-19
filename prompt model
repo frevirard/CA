@@ -1,0 +1,284 @@
+Tu es un expert en design d’architecture fonctionnelle et technique, spécialisé en HTML, CSS et JavaScript.
+
+Je veux que tu génères une page HTML complète, autonome et professionnelle, représentant une architecture applicative, fonctionnelle ou technique sous forme de schéma visuel.
+
+Le rendu attendu doit être proche d’un schéma PowerPoint professionnel d’architecture : clair, structuré, coloré, lisible, avec de belles icônes et une organisation visuelle soignée.
+
+STYLE VISUEL ATTENDU
+
+- Fond clair, propre, légèrement dégradé.
+- Titre principal centré en haut de page.
+- Sous-titre explicatif sous le titre.
+- Grandes étapes horizontales numérotées.
+- Flèches épaisses entre les étapes.
+- Cartes avec bordures bleues, angles arrondis et ombres légères.
+- Icônes grandes, colorées et homogènes.
+- Zone centrale ou basse détaillant les traitements internes.
+- Panneaux latéraux pour les contrôles, la sécurité, les répertoires, le stockage ou les principes clés.
+- Légende en bas de page.
+- Bloc “Livrables finaux” bien visible, avec une grande coche verte.
+- Rendu adapté à une présentation en réunion, comité projet ou support de documentation.
+
+CONTRAINTES TECHNIQUES
+
+- Générer un seul fichier HTML complet.
+- Inclure le CSS dans une balise <style>.
+- Inclure le JavaScript éventuel dans une balise <script>.
+- Ne pas utiliser d’images locales.
+- Utiliser uniquement des ressources CDN fiables.
+- Le fichier doit fonctionner directement dans un navigateur moderne.
+- Le code doit être propre, lisible, structuré et facilement modifiable.
+- Prévoir un rendu imprimable via une règle @media print.
+- Prévoir un minimum de responsive design pour que la page reste lisible sur différents écrans.
+- Éviter les dépendances inutiles.
+- Ne pas générer un simple tableau : le résultat doit être un vrai schéma visuel d’architecture.
+
+LIBRAIRIES ET ICÔNES À UTILISER
+
+Utilise les bibliothèques suivantes si elles sont utiles :
+
+1. Font Awesome
+   - Pour les icônes génériques :
+     - base de données ;
+     - fichier ;
+     - email ;
+     - utilisateur ;
+     - sécurité ;
+     - validation ;
+     - dossier ;
+     - engrenage ;
+     - flèche ;
+     - graphique ;
+     - cloud ;
+     - API ;
+     - serveur.
+
+2. Devicon
+   - Pour les logos officiels ou proches de l’officiel des technologies :
+     - Python ;
+     - JavaScript ;
+     - TypeScript ;
+     - Java ;
+     - Docker ;
+     - Kubernetes ;
+     - Git ;
+     - GitHub ;
+     - PostgreSQL ;
+     - MySQL ;
+     - MongoDB ;
+     - Node.js ;
+     - React ;
+     - Angular ;
+     - Vue ;
+     - Azure ;
+     - AWS ;
+     - Google Cloud.
+
+3. Icônes Microsoft / Office
+   - Pour Microsoft, Excel, Forms, SharePoint, Power BI, Power Automate, Teams ou Microsoft 365 :
+     - utiliser des icônes ou logos aussi proches que possible de l’identité visuelle officielle ;
+     - utiliser les couleurs produit quand un logo officiel direct n’est pas disponible ;
+     - représenter Excel avec un bloc vert marqué “X” ;
+     - représenter Forms avec un bloc vert/bleu marqué “F” ;
+     - représenter Microsoft 365 avec les couleurs Microsoft ;
+     - garder une cohérence visuelle avec les autres icônes.
+
+4. Mermaid.js
+   - À utiliser uniquement si cela améliore la lisibilité.
+   - Peut servir à générer un diagramme de flux complémentaire.
+   - Ne doit pas remplacer toute la mise en page HTML/CSS.
+   - Le schéma principal doit rester visuellement conçu en HTML/CSS.
+
+5. D3.js
+   - À utiliser uniquement si une visualisation dynamique avancée est vraiment nécessaire.
+   - Ne pas l’utiliser pour un simple diagramme statique.
+
+STRUCTURE VISUELLE À PRODUIRE
+
+1. En-tête
+
+Créer un en-tête avec :
+- un grand titre en majuscules ;
+- un sous-titre décrivant le périmètre ;
+- éventuellement une mention de piste, projet, application ou domaine ;
+- une mise en page centrée, élégante et sobre.
+
+2. Bandeau principal des étapes
+
+Créer une ligne horizontale composée de 5 à 8 grandes cartes.
+
+Chaque carte doit contenir :
+- un numéro dans un cercle bleu ;
+- un titre court ;
+- un sous-titre facultatif ;
+- une grande icône ou un logo ;
+- 2 à 4 points clés ;
+- une flèche vers l’étape suivante, sauf pour la dernière.
+
+Le style doit rappeler un schéma d’architecture PowerPoint :
+- cartes blanches ;
+- bordures bleues ;
+- coins arrondis ;
+- flèches bleu foncé ;
+- icônes centrées ;
+- texte concis.
+
+3. Zone de détail des traitements
+
+Créer un grand bloc intitulé :
+
+“Détail du traitement et des productions”
+
+Dans ce bloc, représenter les traitements internes sous forme de sous-sections.
+
+Chaque sous-section peut contenir :
+- un titre numéroté ;
+- une liste de traitements ;
+- des blocs de règles métier ;
+- des fichiers produits ;
+- des scripts ;
+- des flux de données ;
+- des validations ;
+- des transformations ;
+- des appels API ;
+- des échanges avec des applications externes ;
+- des bases de données ;
+- des exports ou imports.
+
+Utiliser :
+- des flèches horizontales entre les sous-sections ;
+- des flèches verticales dans les processus séquentiels ;
+- des icônes cohérentes avec chaque action ;
+- des couleurs différentes selon la nature du bloc.
+
+4. Panneaux latéraux
+
+Ajouter, si pertinent, des panneaux latéraux du type :
+
+- “Contrôles & sécurité”
+- “Répertoires & stockage”
+- “Principes clés”
+- “Contraintes techniques”
+- “Supervision & logs”
+- “Dépendances externes”
+- “Points d’attention”
+
+Chaque panneau doit avoir :
+- un titre ;
+- des icônes ;
+- une liste courte ;
+- un fond légèrement coloré ;
+- une bordure discrète.
+
+5. Légende
+
+Créer une légende en bas de page pour expliquer :
+- les couleurs ;
+- les types d’icônes ;
+- les flux ;
+- les fichiers ;
+- les traitements ;
+- les utilisateurs ;
+- les bases de données ;
+- les applications externes.
+
+6. Livrables finaux
+
+Créer un bloc final visible avec :
+- une grande coche verte ;
+- le titre “Livrables finaux” ;
+- la liste des livrables, fichiers, rapports, tableaux de bord, exports ou résultats attendus.
+
+PALETTE GRAPHIQUE
+
+Utiliser une palette cohérente :
+
+- Bleu foncé :
+  - titres ;
+  - flèches ;
+  - éléments structurants.
+
+- Bleu moyen :
+  - bordures principales ;
+  - numéros d’étapes ;
+  - icônes de données.
+
+- Vert :
+  - validation ;
+  - livrables ;
+  - fichiers produits ;
+  - Microsoft 365 ;
+  - succès.
+
+- Orange :
+  - scripts ;
+  - automatisation ;
+  - traitements techniques.
+
+- Violet :
+  - règles métier ;
+  - regroupements ;
+  - logique fonctionnelle.
+
+- Gris clair :
+  - fonds secondaires ;
+  - zones neutres ;
+  - encadrés de documentation.
+
+EXIGENCES DE DESIGN
+
+- Le schéma doit être immédiatement compréhensible.
+- Les étapes principales doivent se lire de gauche à droite.
+- Les détails doivent se lire de haut en bas ou de gauche à droite.
+- Les textes doivent être courts, lisibles et hiérarchisés.
+- Les icônes doivent aider à comprendre le sens des blocs.
+- Le design doit être homogène.
+- Les espacements doivent être réguliers.
+- Les couleurs doivent être utilisées de manière cohérente.
+- Le rendu doit être professionnel, pas décoratif uniquement.
+- La page doit être présentable telle quelle dans un navigateur ou en capture écran.
+
+EXIGENCES SUR LE CODE
+
+- Produire uniquement le code HTML complet.
+- Ne pas ajouter d’explication avant ou après le code.
+- Le fichier doit commencer par <!DOCTYPE html>.
+- Le CSS doit être bien organisé avec des variables dans :root.
+- Les classes doivent avoir des noms clairs.
+- Le HTML doit être sémantique autant que possible.
+- Les icônes doivent avoir un fallback simple quand c’est utile.
+- Le JavaScript doit être minimal.
+- Ne pas dépendre d’un build tool.
+- Ne pas utiliser React, Vue ou Angular sauf demande explicite.
+- Ne pas utiliser d’images locales.
+- Ne pas créer plusieurs fichiers.
+
+CHAMP LIBRE POUR L’ARCHITECTURE À PRÉSENTER
+
+Utilise l’architecture décrite ci-dessous pour construire le schéma.
+
+Tu peux réorganiser les informations pour obtenir un rendu plus clair, mais tu dois conserver le sens fonctionnel et technique.
+
+Architecture à présenter :
+
+[COLLER ICI LIBREMENT L’ARCHITECTURE À REPRÉSENTER]
+
+FIN DU CHAMP LIBRE
+
+Consignes d’interprétation :
+- Si l’architecture contient beaucoup d’étapes, regroupe-les intelligemment en 5 à 8 grandes phases.
+- Si certains éléments sont techniques, représente-les avec des icônes adaptées.
+- Si des fichiers sont mentionnés, représente-les comme des livrables ou fichiers intermédiaires.
+- Si des applications sont mentionnées, utilise des blocs applicatifs.
+- Si des flux sont mentionnés, représente-les avec des flèches.
+- Si des contrôles sont mentionnés, place-les dans un panneau “Contrôles & sécurité”.
+- Si des logs, dossiers ou emplacements sont mentionnés, place-les dans “Répertoires & stockage”.
+- Si des règles métier sont mentionnées, place-les dans “Principes clés” ou dans une zone dédiée.
+- Si des livrables finaux sont mentionnés, mets-les en évidence en bas à droite ou en bas de page.
+
+Résultat attendu :
+- Un fichier HTML complet.
+- Un rendu professionnel proche d’un schéma d’architecture PowerPoint.
+- Des icônes colorées et cohérentes.
+- Des logos officiels ou proches de l’officiel quand c’est possible.
+- Une architecture claire, synthétique, visuelle et exploitable.
